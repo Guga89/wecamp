@@ -3,11 +3,9 @@ const app = express();
 const path = require('path');
 const { campSchema, reviewSchema } = require('./validationSchemas')
 const ejsMate = require('ejs-mate')
+const session = require('express-session')
 const mongoose = require('mongoose')
-// const catchAsync = require('./utils/catchAsync')
 const ExpressError = require('./utils/ExpressErrors')
-// const Campground = require('./models/campground')
-// const Review = require('./models/review')
 const methodOverride = require('method-override');
 const { AsyncLocalStorage } = require('async_hooks');
 const campRoutes = require('./routers/campRoutes')
@@ -26,12 +24,18 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => { console.log("Database connected") })
 //=========================================================================
 app.set('views', path.join(__dirname, 'views'))
+app.use(express.static(path.join(__dirname, 'public')))
 app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
-
+const sessionConfig = {
+    secret: "Some-test-Secret",
+    resave: false,
+    saveUninitialized: true
+}
+app.use(session(sessionConfig))
 
 //=====================     ROUTES     =====================================
 app.use('/', campRoutes)
