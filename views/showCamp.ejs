@@ -41,7 +41,7 @@
                                     <%= review.body %> - Rating <%= review.rating %>
                                 </p>
 
-                                <form action="/reviews/<%=foundCamp._id %>/<%=review._id %>?_method=DELETE"
+                                <form action="/<%=foundCamp._id %>/reviews/<%=review._id %>?_method=DELETE"
                                     method="POST">
                                     <button class="btn-danger">Delete</button>
                                 </form>
@@ -50,7 +50,7 @@
                         <% } %>
                 </div>
                 <div class="container">
-                    <form action="/reviews/<%=foundCamp._id%>" method="POST" class="form-group needs-validation"
+                    <form action="/<%=foundCamp._id%>/reviews" method="POST" class="form-group needs-validation"
                         novalidate>
                         <div class="mb-3">
                             <label for="rating">Rating</label>

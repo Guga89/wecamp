@@ -35,7 +35,7 @@ app.use(methodOverride('_method'))
 
 //=====================     ROUTES     =====================================
 app.use('/', campRoutes)
-app.use('/reviews', reviewRoutes)
+app.use('/:id/reviews', reviewRoutes)
 
 
 //============================================================================
