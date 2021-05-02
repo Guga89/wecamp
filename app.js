@@ -5,11 +5,16 @@ const { campSchema, reviewSchema } = require('./validationSchemas')
 const ejsMate = require('ejs-mate')
 const session = require('express-session')
 const mongoose = require('mongoose')
+const flash = require('connect-flash')
 const ExpressError = require('./utils/ExpressErrors')
 const methodOverride = require('method-override');
 const { AsyncLocalStorage } = require('async_hooks');
 const campRoutes = require('./routers/campRoutes')
 const reviewRoutes = require('./routers/reviewRoutes')
+const passport = require('passport')
+const passportLocal = require('passport-local')
+const User = require('./models/user')
+const userRoutes = require('./routers/userRoutes')
 //========================   Mongoose  =================================================
 mongoose.connect('mongodb://localhost:27017/yelp-camp', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false })
     .then(() => {
@@ -29,20 +34,38 @@ app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
-
+//===========================session configuration=========================
 const sessionConfig = {
     secret: "Some-test-Secret",
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }
 app.use(session(sessionConfig))
+//=======================FLASH===========================================
+app.use(flash())
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success')
+    res.locals.error = req.flash('error')
+    next()
+})
+//======================passport configs=================================
+app.use(passport.initialize())
+app.use(passport.session())
+passport.use(new passportLocal(User.authenticate()))
+passport.serializeUser(User.serializeUser()) //helps us to add user_id to the session/cookie
+passport.deserializeUser(User.deserializeUser()) //removed that session_id when logout or expire
+
 
 //=====================     ROUTES     =====================================
 app.use('/', campRoutes)
 app.use('/:id/reviews', reviewRoutes)
+app.use('/register', userRoutes)
 
-
-//============================================================================
 app.all('*', (req, res, next) => {
     next(new ExpressError('Oh-oooh! Page Not Found ', 404))
 })
