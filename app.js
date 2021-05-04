@@ -48,11 +48,7 @@ const sessionConfig = {
 app.use(session(sessionConfig))
 //=======================FLASH===========================================
 app.use(flash())
-app.use((req, res, next) => {
-    res.locals.success = req.flash('success')
-    res.locals.error = req.flash('error')
-    next()
-})
+
 //======================passport configs=================================
 app.use(passport.initialize())
 app.use(passport.session())
@@ -60,11 +56,16 @@ passport.use(new passportLocal(User.authenticate()))
 passport.serializeUser(User.serializeUser()) //helps us to add user_id to the session/cookie
 passport.deserializeUser(User.deserializeUser()) //removed that session_id when logout or expire
 
-
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next()
+})
 //=====================     ROUTES     =====================================
 app.use('/', campRoutes)
 app.use('/:id/reviews', reviewRoutes)
-app.use('/register', userRoutes)
+app.use('/', userRoutes)
 
 app.all('*', (req, res, next) => {
     next(new ExpressError('Oh-oooh! Page Not Found ', 404))

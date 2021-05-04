@@ -1,19 +1,21 @@
 const express = require('express')
 const catchAsync = require('../utils/catchAsync')
 const router = express.Router()
+const passport = require('passport')
 const ExpressError = require('../utils/ExpressErrors')
 const { validateCamp } = require('../middlewares/middlewares')
 const Campground = require('../models/campground')
 const Review = require('../models/review')
+const { isLoggedIn } = require('../middlewares/isLoggedIn')
 
 router.get('/', catchAsync(async (req, res, next) => {
     const allCamps = await Campground.find({})
     res.render('campgrounds', { allCamps })
 }))
-router.get('/new', (req, res) => {
+router.get('/new', isLoggedIn, (req, res) => {
     res.render('newCamp')
 })
-router.post('/new', validateCamp, catchAsync(async (req, res) => {
+router.post('/new', isLoggedIn, validateCamp, catchAsync(async (req, res) => {
     const camp = req.body
     const newCamp = new Campground({ ...camp })
     const campObj = await newCamp.save()
