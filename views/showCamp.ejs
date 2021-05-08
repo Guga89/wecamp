@@ -1,11 +1,35 @@
 <% layout('layouts/boilerplate')%>
+    <link rel="stylesheet" href="/stylesheet/stars.css">
 
     <body>
 
         <div class="row">
             <div class="col-6">
+
                 <div class="card mb-3">
-                    <img src="<%= foundCamp.image%>" class="card-img-top" alt="...">
+
+                    <div id="campgroundCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <% foundCamp.images.forEach((img, i)=>{ %>
+                                <div class="carousel-item <%=i===0 ? 'active' : '' %>">
+                                    <img src="<%=img.url %>" class="d-block w-100 card-image-top" alt="">
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% if( foundCamp.images.length> 1) {%>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#campgroundCarousel"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#campgroundCarousel"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            <% } %>
+                    </div>
+
                     <div class="card-body">
                         <h5 class="card-title">
                             <%= foundCamp.title%>
@@ -38,33 +62,26 @@
 
             </div>
             <div class="col-6">
-                <div>
-                    <% for (let review of foundCamp.reviews) { %>
-                        <div class="card">
-                            <div class="card-body">
-                                <h3>
-                                    <% review.author %>
-                                </h3>
-                                <p>
-                                    <%= review.body %> - Rating <%= review.rating %>
-                                </p>
-                                <% if(currentUser && currentUser._id.equals(review.author._id)) { %>
-                                    <form action="/<%=foundCamp._id %>/reviews/<%=review._id %>?_method=DELETE"
-                                        method="POST">
-                                        <button class="btn-danger">Delete</button>
-                                    </form>
-                                    <% } %>
-                            </div>
-                        </div>
-                        <% } %>
-                </div>
                 <% if(currentUser){ %>
                     <div class="container">
                         <form action="/<%=foundCamp._id%>/reviews" method="POST" class="form-group needs-validation"
                             novalidate>
-                            <div class="mb-3">
-                                <label for="rating">Rating</label>
-                                <input type="range" min="1" max="5" id="rating" name="rating" class="form-range">
+                            <div>
+                                <fieldset class="starability-grow">
+                                    <legend>Rating:</legend>
+                                    <input type="radio" id="no-rate" class="input-no-rate" name="rating" value="0"
+                                        checked aria-label="No rating." />
+                                    <input type="radio" id="first-rate1" name="rating" value="1" />
+                                    <label for="first-rate1" title="Terrible">1 star</label>
+                                    <input type="radio" id="first-rate2" name="rating" value="2" />
+                                    <label for="first-rate2" title="Not good">2 stars</label>
+                                    <input type="radio" id="first-rate3" name="rating" value="3" />
+                                    <label for="first-rate3" title="Average">3 stars</label>
+                                    <input type="radio" id="first-rate4" name="rating" value="4" />
+                                    <label for="first-rate4" title="Very good">4 stars</label>
+                                    <input type="radio" id="first-rate5" name="rating" value="5" />
+                                    <label for="first-rate5" title="Amazing">5 stars</label>
+                                </fieldset>
                             </div>
                             <div class="form-group">
                                 <label for="comment"></label>
@@ -79,6 +96,31 @@
                         </form>
                     </div>
                     <% } %>
+                        <div>
+                            <% for (let review of foundCamp.reviews) { %>
+                                <div class="card mt-3">
+                                    <div class="card-body">
+                                        <h4>
+                                            <%= review.author.username %>
+                                        </h4>
+                                        <p class="starability-result" data-rating="<%= review.rating %>">
+                                            Rated: <%= review.rating %> stars
+                                        </p>
+                                        <p>
+                                            <%= review.body %>
+                                        </p>
+                                        <% if(currentUser && currentUser._id.equals(review.author._id)) { %>
+                                            <form action="/<%=foundCamp._id %>/reviews/<%=review._id %>?_method=DELETE"
+                                                method="POST">
+                                                <button class="btn btn-sm btn-outline-danger"><i
+                                                        class="bi bi-trash"></i></button>
+                                            </form>
+                                            <% } %>
+                                    </div>
+                                </div>
+                                <% } %>
+                        </div>
+
             </div>
         </div>
 

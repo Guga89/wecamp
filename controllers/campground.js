@@ -11,8 +11,12 @@ module.exports.newCampRender = (req, res) => {
 
 module.exports.createCamp = async (req, res) => {
     const camp = req.body
+    const images = req.files.map((img) => {
+        return { filename: img.filename, url: img.path }
+    })
     const newCamp = new Campground({ ...camp })
     newCamp.author = req.user._id
+    newCamp.images = images
     const campObj = await newCamp.save()
     req.flash('success', 'Campground successfully created!')
     res.redirect(`/${campObj._id}/show`)
