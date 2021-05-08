@@ -1,45 +1,18 @@
 const express = require('express')
 const catchAsync = require('../utils/catchAsync')
 const router = express.Router()
-const passport = require('passport')
-const ExpressError = require('../utils/ExpressErrors')
 const { validateCamp } = require('../middlewares/middlewares')
-const Campground = require('../models/campground')
-const Review = require('../models/review')
 const { isLoggedIn } = require('../middlewares/isLoggedIn')
+const { isAuthor } = require('../middlewares/isAuthor')
+const campgrounds = require('../controllers/campground')
 
-router.get('/', catchAsync(async (req, res, next) => {
-    const allCamps = await Campground.find({})
-    res.render('campgrounds', { allCamps })
-}))
-router.get('/new', isLoggedIn, (req, res) => {
-    res.render('newCamp')
-})
-router.post('/new', isLoggedIn, validateCamp, catchAsync(async (req, res) => {
-    const camp = req.body
-    const newCamp = new Campground({ ...camp })
-    const campObj = await newCamp.save()
-    req.flash('success', 'Campground successfully created!')
-    res.redirect(`/${campObj._id}/show`)
-}))
-router.get('/:id/show', catchAsync(async (req, res) => {
-    const foundCamp = await Campground.findById(req.params.id).populate("reviews")
-    res.render('showCamp', { foundCamp })
-}))
-router.get('/:id/edit', catchAsync(async (req, res) => {
-    const foundCamp = await Campground.findById(req.params.id)
-    res.render('editCamp', { foundCamp })
-}))
-router.put('/:id/edit', validateCamp, catchAsync(async (req, res) => {
-    const foundCamp = await Campground.findByIdAndUpdate(req.params.id, { ...req.body })
-    req.flash('success', 'Campground successfully edited!')
-    res.redirect(`/${foundCamp._id}/show`)
-}))
 
-router.delete('/:id/delete', catchAsync(async (req, res) => {
-    const foundCamp = await Campground.findByIdAndDelete(req.params.id)
-    req.flash('success', 'Campground successfully deleted!')
-    res.redirect('/')
-}))
+router.get('/', catchAsync(campgrounds.showAll))
+router.get('/new', isLoggedIn, campgrounds.newCampRender)
+router.post('/new', isLoggedIn, validateCamp, catchAsync(campgrounds.createCamp))
+router.get('/:id/show', catchAsync(campgrounds.showCamp))
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(campgrounds.renderEditCamp))
+router.put('/:id/edit', isLoggedIn, isAuthor, validateCamp, catchAsync(campgrounds.editCamp))
+router.delete('/:id/delete', isAuthor, catchAsync(campgrounds.deleteCamp))
 
 module.exports = router

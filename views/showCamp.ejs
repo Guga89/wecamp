@@ -18,17 +18,22 @@
                         <li class="list-group-item text-muted">
                             <%= foundCamp.location%>
                         </li>
+                        <li class="list-group-item text-muted">
+                            Submitted by <%= foundCamp.author.username%>
+                        </li>
                         <li class="list-group-item">$<%= foundCamp.price%>/night</li>
                     </ul>
-                    <div class="card-body">
-                        <a class="card-link btn btn-info" href="/<%=foundCamp._id%>/edit">Edit</a>
-                        <form class="d-inline" action="/<%=foundCamp._id%>/delete?_method=DELETE" method="POST">
-                            <button class="btn btn-danger">Delete</button>
-                        </form>
-                    </div>
-                    <div class="card-footer text-muted">
-                        2 days ago
-                    </div>
+                    <% if(currentUser && currentUser._id.equals(foundCamp.author._id)) {%>
+                        <div class="card-body">
+                            <a class="card-link btn btn-info" href="/<%=foundCamp._id%>/edit">Edit</a>
+                            <form class="d-inline" action="/<%=foundCamp._id%>/delete?_method=DELETE" method="POST">
+                                <button class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                        <% } %>
+                            <div class="card-footer text-muted">
+                                2 days ago
+                            </div>
                 </div>
 
             </div>
@@ -37,38 +42,43 @@
                     <% for (let review of foundCamp.reviews) { %>
                         <div class="card">
                             <div class="card-body">
+                                <h3>
+                                    <% review.author %>
+                                </h3>
                                 <p>
                                     <%= review.body %> - Rating <%= review.rating %>
                                 </p>
-
-                                <form action="/<%=foundCamp._id %>/reviews/<%=review._id %>?_method=DELETE"
-                                    method="POST">
-                                    <button class="btn-danger">Delete</button>
-                                </form>
+                                <% if(currentUser && currentUser._id.equals(review.author._id)) { %>
+                                    <form action="/<%=foundCamp._id %>/reviews/<%=review._id %>?_method=DELETE"
+                                        method="POST">
+                                        <button class="btn-danger">Delete</button>
+                                    </form>
+                                    <% } %>
                             </div>
                         </div>
                         <% } %>
                 </div>
-                <div class="container">
-                    <form action="/<%=foundCamp._id%>/reviews" method="POST" class="form-group needs-validation"
-                        novalidate>
-                        <div class="mb-3">
-                            <label for="rating">Rating</label>
-                            <input type="range" min="1" max="5" id="rating" name="rating" class="form-range">
-                        </div>
-                        <div class="form-group">
-                            <label for="comment"></label>
-                            <textarea class="form-control" id="comment" name="body" required rows="3"
-                                placeholder="Please leave your comment here"></textarea>
-                            <div class="invalid-feedback">
-                                Please enter some comment.
+                <% if(currentUser){ %>
+                    <div class="container">
+                        <form action="/<%=foundCamp._id%>/reviews" method="POST" class="form-group needs-validation"
+                            novalidate>
+                            <div class="mb-3">
+                                <label for="rating">Rating</label>
+                                <input type="range" min="1" max="5" id="rating" name="rating" class="form-range">
                             </div>
-                            <button class="btn btn-success float-right mt-4">Post
-                                my review</button>
-                        </div>
-                    </form>
-
-                </div>
+                            <div class="form-group">
+                                <label for="comment"></label>
+                                <textarea class="form-control" id="comment" name="body" required rows="3"
+                                    placeholder="Please leave your comment here"></textarea>
+                                <div class="invalid-feedback">
+                                    Please enter some comment.
+                                </div>
+                                <button class="btn btn-success float-right mt-4">Post
+                                    my review</button>
+                            </div>
+                        </form>
+                    </div>
+                    <% } %>
             </div>
         </div>
 
