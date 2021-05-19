@@ -20,6 +20,7 @@ const passportLocal = require('passport-local')
 const User = require('./models/user')
 const userRoutes = require('./routers/userRoutes')
 
+const mongoSanitize = require('express-mongo-sanitize')
 //========================   Mongoose  =================================================
 mongoose.connect('mongodb://localhost:27017/yelp-camp', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false })
     .then(() => {
@@ -39,13 +40,16 @@ app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
+app.use(mongoSanitize())  // configuration against mongo injections
 //===========================session configuration=========================
 const sessionConfig = {
+    name: 'SessionNameInsteadof_defaultOne',
     secret: "Some-test-Secret",
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
+        // secure: true, // this will be added on the production/deployed site
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }

@@ -15,7 +15,7 @@ router.get('/new', isLoggedIn, campgrounds.newCampRender)
 router.post('/new', isLoggedIn, upload.array('image'), validateCamp, catchAsync(campgrounds.createCamp))
 router.get('/:id/show', catchAsync(campgrounds.showCamp))
 router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(campgrounds.renderEditCamp))
-router.put('/:id/edit', isLoggedIn, isAuthor, validateCamp, catchAsync(campgrounds.editCamp))
+router.put('/:id/edit', isLoggedIn, upload.array('image'), isAuthor, validateCamp, catchAsync(campgrounds.editCamp))
 router.delete('/:id/delete', isAuthor, catchAsync(campgrounds.deleteCamp))
 
 module.exports = router

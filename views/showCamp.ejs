@@ -15,6 +15,7 @@
                                     <img src="<%=img.url %>" class="d-block w-100 card-image-top" alt="">
                                 </div>
                                 <% }) %>
+
                         </div>
                         <% if( foundCamp.images.length> 1) {%>
                             <button class="carousel-control-prev" type="button" data-bs-target="#campgroundCarousel"
@@ -62,6 +63,7 @@
 
             </div>
             <div class="col-6">
+                <div id='map' style='width: 100%; height: 300px;'></div>
                 <% if(currentUser){ %>
                     <div class="container">
                         <form action="/<%=foundCamp._id%>/reviews" method="POST" class="form-group needs-validation"
@@ -126,4 +128,9 @@
 
         </div>
         </div>
+        <script>
+            const mapToken = '<%- process.env.MAPBOX_TOKEN %>'
+            const foundCamp = <%- JSON.stringify(foundCamp) %>
+        </script>
+        <script src="/js/showMap.js"></script>
     </body>
