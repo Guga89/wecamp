@@ -38,6 +38,6 @@ module.exports.campSchema = Joi.object({
 })
 
 module.exports.reviewSchema = Joi.object({
-    body: Joi.string().required().escapeHTML(),
+    body: Joi.string().required(),
     rating: Joi.number().min(0).max(5).required()
 })

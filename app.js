@@ -19,9 +19,13 @@ const passport = require('passport')
 const passportLocal = require('passport-local')
 const User = require('./models/user')
 const userRoutes = require('./routers/userRoutes')
+const helmet = require('helmet')
+const dbURL = process.env.DB_URL
+const MongoStore = require('connect-mongo');
 
 const mongoSanitize = require('express-mongo-sanitize')
 //========================   Mongoose  =================================================
+// mongoose.connect(dbURL, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false })
 mongoose.connect('mongodb://localhost:27017/yelp-camp', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false })
     .then(() => {
         console.log("we are connected")
@@ -42,7 +46,17 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(mongoSanitize())  // configuration against mongo injections
 //===========================session configuration=========================
+const store = new MongoStore({
+    url: 'mongodb://localhost:27017/yelp-camp',
+    secret: 'Some-test-Secret',
+    touchAfter: 24 * 60 * 60
+});
+store.on('error', function (err) {
+    console.log("SESSION STORE ERROR", err)
+})
+
 const sessionConfig = {
+    store,
     name: 'SessionNameInsteadof_defaultOne',
     secret: "Some-test-Secret",
     resave: false,
