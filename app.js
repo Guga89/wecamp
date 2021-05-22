@@ -46,8 +46,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(mongoSanitize())  // configuration against mongo injections
 //===========================session configuration=========================
-const store = new MongoStore({
-    url: 'mongodb://localhost:27017/yelp-camp',
+const store = MongoStore.create({
+    mongoUrl: 'mongodb://localhost:27017/yelp-camp',
     secret: 'Some-test-Secret',
     touchAfter: 24 * 60 * 60
 });
